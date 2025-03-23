@@ -6,28 +6,28 @@ Este repositório contém o esquema do banco de dados utilizado no projeto UPA C
 
 🏗 Estrutura do Banco de Dados
 
-SGBD: MySQL
+    SGBD: MySQL
 
-Modelo: Relacional
+    Modelo: Relacional
 
-Padrão de nomenclatura: snake_case para tabelas e colunas
+    Padrão de nomenclatura: snake_case para tabelas e colunas
 
 📂 Entidades
 
-upa 🏥 - Contém as informações de uma determinada UPA.
+    upa 🏥 - Contém as informações de uma determinada UPA.
 
-endereco 📍 - Contém endereços que podem pertencer tanto às UPAs quanto aos pacientes.
+    endereco 📍 - Contém endereços que podem pertencer tanto às UPAs quanto aos pacientes.
 
-temperatura_ambiente 🌡️ - Dados coletados do sensor de temperatura do ambiente da UPA.
+    temperatura_ambiente 🌡️ - Dados coletados do sensor de temperatura do ambiente da UPA.
 
-camera_computacional 🎥 - Dados coletados do sensor da câmera computacional, com o principal objetivo de saber a quantidade de pessoas no ambiente.
+    camera_computacional 🎥 - Dados coletados do sensor da câmera computacional, com o principal objetivo de saber a quantidade de pessoas no ambiente.
 
-umidade 💧 - Dados coletados do sensor de umidade da UPA.
+    umidade 💧 - Dados coletados do sensor de umidade da UPA.
 
-paciente 🧑‍⚕️ - Contém informações pessoais de pacientes.
+    paciente 🧑‍⚕️ - Contém informações pessoais de pacientes.
 
-temperatura_paciente 🤒 - Dados coletados do sensor que mede a temperatura do paciente ao entrar na UPA.
+    temperatura_paciente 🤒 - Dados coletados do sensor que mede a temperatura do paciente ao entrar na UPA.
 
-oximetro 🩸 - Dados coletados da oxigenação do sangue do paciente assim que entrar na UPA.
+    oximetro 🩸 - Dados coletados da oxigenação do sangue do paciente assim que entrar na UPA.
 
-biometria 🖐️ - Dados da biometria digital dos pacientes, para que a UPA possa fazer um atendimento mais veloz.
+    biometria 🖐️ - Dados da biometria digital dos pacientes, para que a UPA possa fazer um atendimento mais veloz.
