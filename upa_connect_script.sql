@@ -9,7 +9,9 @@ rua VARCHAR(45),
 bairro VARCHAR(45),
 numero INT,
 cidade VARCHAR(45),
-estado VARCHAR (45),
+estado VARCHAR(45),
+latitude DECIMAL(10,8),
+longitude DECIMAL(11,8),
 entidade_referenciada CHAR(1)
 );
 
