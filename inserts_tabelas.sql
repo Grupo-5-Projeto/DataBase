@@ -1,3 +1,4 @@
+-- Endereços dos Pacientes da Cidade de São Paulo
 INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, entidade_referenciada) VALUES
 ('08472-170', 'Rua Igarapé da Diana', 'Cidade Tiradentes', 125, 'São Paulo', 'SP', 'S'),
 ('08295-005', 'Av. Miguel Ignácio Curi', 'Vila Carmosina', 41, 'São Paulo', 'SP', 'S'),
@@ -61,13 +62,63 @@ INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, entidade_referen
 ('03276-010', 'Rua José Otoni', 'Vila Bela', 89, 'São Paulo', 'SP', 'S'),
 ('04304-020', 'Rua Murilo Furtado', 'Jabaquara', 415, 'São Paulo', 'SP', 'S');
 
+-- Endereços das UPAs da Cidade de São Paulo
+INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, entidade_referenciada) VALUES
+('02736-110', 'R. Dr. Francisco Laraya', 'Freguesia do Ó', 20, 'São Paulo', 'SP', 'S'),
+('08295-005', 'Av. Miguel Ignácio Curi', 'Vila Carmosina', 41, 'São Paulo', 'SP', 'S'),
+('05846-420', 'R. Thereza Mouco de Oliveira', 'Vila Maracana', 121, 'São Paulo', 'SP', 'S'),
+('03403-002', 'Av. Conselheiro Carrão', 'Vila Carrão', 2893, 'São Paulo', 'SP', 'S'),
+('08472-610', 'R. Cachoeira Camaleão', 'Conj. Hab. Inacio Monteiro', 599, 'São Paulo', 'SP', 'S'),
+('02995-145', 'Estr. das Taipas', 'Parque Nações Unidas', 1650, 'São Paulo', 'SP', 'S'),
+('04845-000', 'R. Antônio Felipe Filho', 'Jardim Somara', 180, 'São Paulo', 'SP', 'S'),
+('08140-270', 'R. Ilha do Arvoredo', 'Vila Morgadouro', 251, 'São Paulo', 'SP', 'S'),
+('03807-370', 'R. Miguel Novais', 'Vila Paranagua', 113, 'São Paulo', 'SP', 'S'),
+('04330-060', 'R. Cruz das Almas', 'Vila Campestre', 290, 'São Paulo', 'SP', 'S'),
+('02278-040', 'R. Ester Elisa', 'Vila Nilo', 200, 'São Paulo', 'SP', 'S'),
+('04937-000', 'Estrada Guavirituba', 'Vila Santa Lúcia', 49, 'São Paulo', 'SP', 'S'),
+('02873-250', 'R. Rômulo Naldi', 'Conj. Promorar Estrada da Parada', 1, 'São Paulo', 'SP', 'S'),
+('08090-370', 'R. Kumaki Aoki', 'Jardim Helena', 1022, 'São Paulo', 'SP', 'S'),
+('04837-150', 'Rua São Roque do Paraguaçu', 'Vila Quintana', 190, 'São Paulo', 'SP', 'S'),
+('02671-100', 'R. Afonso Lopes Vieira', 'Vila Dionisia', 35, 'São Paulo', 'SP', 'S'),
+('08431-640', 'R. Serra da Queimada', 'Parque Guaianazes', 800, 'São Paulo', 'SP', 'S'),
+('02675-031', 'Av. Queiroz Filho', 'Vila Hamburguesa', 313, 'São Paulo', 'SP', 'S'),
+('03163-030', 'Rua Dr. Fomm', 'Belenzinho', 261, 'São Paulo', 'SP', 'S'),
+('04883-025', 'Estr. Ecoturística de Parelheiros', 'Jardim Casa Grande', 5252, 'São Paulo', 'SP', 'S'),
+('04474-000', 'R. dos Aniquis', 'Jardim Santa Terezinha (Zona Sul)', 3, 'São Paulo', 'SP', 'S'),
+('04459-000', 'R. Antônio do Campo', 'Jardim Campo Grande', 40, 'São Paulo', 'SP', 'S'),
+('05202-140', 'R. Estevan Ribeiro Resende', 'Perus', 400, 'São Paulo', 'SP', 'S'),
+('02945-000', 'Av. Menotti Laudisio', 'Jardim Cidade Pirituba', 100, 'São Paulo', 'SP', 'S'),
+('05376-000', 'R. José Vicente da Cruz', 'Vila Antonio', 90, 'São Paulo', 'SP', 'S');
 
+-- Cadastrando UPAs da Cidade de São Paulo
 INSERT INTO upa (nome, cnpj, telefone, capacidade_atendimento, fk_endereco) VALUES 
-('UPA Central', '12345678000195', '11987654321', 100, 1),
-('UPA Norte', '23456789000198', '11976543210', 120, 2),
-('UPA Sul', '34567890000187', '11975432109', 150, 3),
-('UPA Leste', '45678901000176', '11974321098', 80, 4);
+('UPA 21 DE JUNHO', '12345678000195', '1139755866', 100, 62),
+('UPA 26 DE AGOSTO', '25648951458745', '1147805081', 150, 63),
+('UPA CAMPO LIMPO - DR FERNANDO MAURO PROENÇA DE GOUVEA', '32145698595748', '1158143776', 89, 64),
+('UPA MASATAKA OTA', '98596478564895', '1134698877', 126, 65),
+('UPA CIDADE TIRADENTES', '21458745812547', '1155557348', 140, 66),
+('UPA CITY JARAGUÁ', '32561515263425', '1132459030', 325, 67),
+('UPA DONA MARIA ANTONIETA FERREIRA DE BARROS', '33354125455251', '1151780713', 200, 68),
+('UPA DR. ATUALPA GIRÃO RABELO', '78787895468254', '1125620270', 150, 69),
+('UPA ERMELINO MATARAZZO', '23655562525412', '1125743343', 321, 70),
+('UPA JABAQUARA', '22235417854856', '11452166845', 200, 71),
+('UPA JAÇANÃ', '78978978978978', '1122434583', 120, 72),
+('UPA JARDIM ANGELA', '23252526232124', 234, 73),
+('UPA JARDIM ELISA MARIA I', '23598747854562', 80, 74),
+('UPA JARDIM HELENA', '14121513141718', '1131958140', 112, 75),
+('UPA JARDIM ICARAI QUINTANA', '98969597949596', '1136489524', 150, 76),
+('UPA JARDIM PERI', '16565985321400', '1139828314', 326, 77),
+('UPA JULIO TUPY', '18585825250201', '1125116665', 94, 78),
+('UPA LAPA - PROF. JOÃO CATARIN MEZOMO', '10020103020504', '1148781701', 185, 79),
+('UPA MOOCA - DOM PAULO EVARISTO ARNS', '15864985023014', '1132459020', 106, 80),
+('UPA PARELHEIROS', '15951591595159', '1151931870', 142, 81),
+('UPA PARQUE DOROTEIA', '09080704050601', '1155600890', 195, 82),
+('UPA PEDREIRA - DR. CESAR ANTUNES DA ROCHA', '28293635343102', '1152377320', 126, 83),
+('UPA PERUS - DR. LUIZ ANTONIO DE ABREU SAMPAIO DORIA', '15123456789123', 203, 84),
+('UPA PIRITUBA', '15181714171417', '1120395555', 138, 85),
+('UPA RIO PEQUENO', '13698741236987', '1150435550', 258, 86);
 
+-- Mockando pacientes da Cidade de São Paulo
 INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa) VALUES
 ('Ana Souza', '22813945182', '1990-05-12', '123456789012345', 1, NULL),
 ('Bruno Oliveira', '93526748006', '1985-08-23', '234567890123456', 2, NULL),

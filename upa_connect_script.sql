@@ -1,9 +1,10 @@
+DROP DATABASE IF EXISTS upa_connect;
 CREATE DATABASE upa_connect;
 USE upa_connect;
 
 CREATE TABLE endereco (
 id_endereco INT PRIMARY KEY AUTO_INCREMENT,
-cep CHAR(8),
+cep CHAR(9),
 rua VARCHAR(45),
 bairro VARCHAR(45),
 numero INT,
@@ -14,7 +15,7 @@ entidade_referenciada CHAR(1)
 
 CREATE TABLE upa (
 id_upa INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(45),
+nome VARCHAR(90),
 cnpj CHAR(14),
 telefone CHAR(11),
 capacidade_atendimento INT,
