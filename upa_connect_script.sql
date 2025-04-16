@@ -1,5 +1,10 @@
 DROP DATABASE IF EXISTS upa_connect;
 CREATE DATABASE upa_connect;
+
+CREATE USER IF NOT EXISTS 'admin_upa_connect'@'%' IDENTIFIED BY 'urubu100';
+GRANT ALL PRIVILEGES ON upa_connect.* TO 'admin_upa_connect'@'%';
+FLUSH PRIVILEGES;
+
 USE upa_connect;
 
 CREATE TABLE endereco (
