@@ -5,7 +5,7 @@ USE upa_connect;
 CREATE TABLE endereco (
 id_endereco INT PRIMARY KEY AUTO_INCREMENT,
 cep CHAR(9),
-rua VARCHAR(45),
+rua VARCHAR(70),
 bairro VARCHAR(45),
 numero INT,
 cidade VARCHAR(45),
