@@ -15,8 +15,8 @@ bairro VARCHAR(45),
 numero INT,
 cidade VARCHAR(45),
 estado VARCHAR(45),
-latitude DECIMAL(10,8),
-longitude DECIMAL(11,8),
+latitude DOUBLE,
+longitude DOUBLE,
 entidade_referenciada CHAR(1)
 );
 
