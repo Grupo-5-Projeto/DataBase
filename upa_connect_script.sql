@@ -26,9 +26,15 @@ nome VARCHAR(90),
 cnpj CHAR(14),
 telefone CHAR(11),
 capacidade_atendimento INT,
-tempo_espera INT, -- em minutos
 fk_endereco INT,
 FOREIGN KEY (fk_endereco) REFERENCES endereco(id_endereco)
+);
+
+CREATE TABLE tempo_espera (
+id_tempo_espera INT PRIMARY KEY AUTO_INCREMENT,
+tempo_espera INT,
+fk_upa INT,
+FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
 );
 
 CREATE TABLE temperatura_ambiente (
