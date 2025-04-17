@@ -26,6 +26,7 @@ nome VARCHAR(90),
 cnpj CHAR(14),
 telefone CHAR(11),
 capacidade_atendimento INT,
+tempo_espera INT, -- em minutos
 fk_endereco INT,
 FOREIGN KEY (fk_endereco) REFERENCES endereco(id_endereco)
 );
