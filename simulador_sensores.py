@@ -52,6 +52,16 @@ def umidade():
     RH = (V_sensor / V_max) * 100
     return RH
 
+
+pessoas = random.randint(40, 150)
+
+def visao_computacional():
+    global pessoas
+    variacao = random.randint(-1, 1) 
+    pessoas += variacao
+    pessoas = max(40, min(pessoas, 150)) 
+    return pessoas
+    
 cursor.execute("SELECT id_paciente FROM paciente")
 pacientes = cursor.fetchall()
 
@@ -68,6 +78,7 @@ else:
             spo2 = oximetro()
             umi = umidade()
             temp_ambi = temperatura_ambiente()
+            qtde_pessoas = visao_computacional()
             data_hora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
             cursor.execute("""
@@ -90,9 +101,15 @@ else:
                 VALUES (%s, %s, %s);
             """, (data_hora, umi, 1)) 
 
+            cursor.execute("""
+                INSERT INTO camera_computacional (data_hora, qtd_pessoas, fk_upa)
+                VALUES (%s, %s, %s);
+            """, (data_hora, qtde_pessoas, 1)) 
+
             conn.commit()
             print(f"Paciente {id_paciente} -> Temperatura: {temp_paci:.2f}°C, SpO2: {spo2:.1f}%")
             print(f"Temperatura: {temp_ambi:.2f}°C, Umidade: {umi:.2f}%")
+            print(f"Quantidade de pessoas: {qtde_pessoas}")
 
 cursor.close()
 conn.close()
