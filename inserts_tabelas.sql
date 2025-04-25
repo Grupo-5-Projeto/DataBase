@@ -30,9 +30,6 @@ INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, latitude, longit
 ('08032-150', 'Rua Emílio Pantoja', 'Jardim Santo Antônio', 113, 'São Paulo', 'SP',-23.51428689639223, -46.42825414546211, 'P'),
 ('08140-030', 'Travessa Megilo de Agrigento', 'Jardim Luciana', 1051, 'São Paulo', 'SP', -23.499984460252456, -46.40000973382685,'P');
 
-
-
-
 -- Endereços das UPAs da Cidade de São Paulo
 INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade_referenciada) VALUES
 ('02736-110', 'R. Dr. Francisco Laraya', 'Freguesia do Ó', 20, 'São Paulo', 'SP', -23.489573382451223, -46.688539776679434,'U'),
@@ -111,6 +108,54 @@ INSERT INTO upa (nome, cnpj, telefone, capacidade_atendimento, fk_endereco) VALU
 ('UPA VILA SANTA CATARINA', '46392130000380', '01121512085', 123, 63) -- capacidade
 ;
 
+INSERT INTO tempo_espera (tempo_espera, fk_upa) VALUES
+(25, 1),
+(40, 2),
+(15, 3),
+(50, 4),
+(35, 5),
+(20, 6),
+(45, 7),
+(30, 8),
+(60, 9),
+(18, 10),
+(22, 11),
+(28, 12),
+(55, 13),
+(33, 14),
+(48, 15),
+(17, 16),
+(26, 17),
+(38, 18),
+(31, 19),
+(24, 20),
+(29, 21),
+(19, 22),
+(36, 23),
+(42, 24),
+(37, 25),
+(21, 26),
+(44, 27),
+(32, 28),
+(53, 29),
+(27, 30),
+(41, 31),
+(34, 32),
+(22, 33),
+(46, 34);
+
+SELECT 
+    u.id_upa,
+    u.nome AS nome_upa,
+    t.tempo_espera,
+    e.rua,
+    e.numero,
+    e.bairro,
+    e.cidade,
+    e.estado
+FROM upa u
+LEFT JOIN tempo_espera t ON u.id_upa = t.fk_upa
+LEFT JOIN endereco e ON u.fk_endereco = e.id_endereco;
 
 -- Mockando pacientes da Cidade de São Paulo
 INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa) VALUES
