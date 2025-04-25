@@ -5,8 +5,8 @@ from datetime import datetime
 
 DB_CONFIG = {
     'host': 'localhost', 
-    'user': 'root',  
-    'password': 'Urubu100', 
+    'user': 'admin_upa_connect',  
+    'password': 'urubu100', 
     'database': 'upa_connect'
 }
 
@@ -21,18 +21,19 @@ VCC = 3.3  # Tensão de alimentação do circuito
 ADC_MAX = 1023  # Resolução de 10 bits (0-1023)
 
 def temperatura_corporal():
-    adc_value = random.randint(630, 650)  
+    adc_value = random.randint(610, 670)  # Intervalo ajustado
     V_sensor = (adc_value / ADC_MAX) * VCC
     R_ntc = R_REF * ((VCC / V_sensor) - 1)
 
-    T_kelvin = 1 / (A + B * math.log(R_ntc) + C * (math.log(R_ntc))**3)  # Equação de Steinhart-Hart
-    T_celsius = T_kelvin - 273.15 # Convertendo para Celsius
+    T_kelvin = 1 / (A + B * math.log(R_ntc) + C * (math.log(R_ntc))**3)
+    T_celsius = T_kelvin - 273.15
 
     return round(T_celsius, 2)
 
 def oximetro():
-    V_sensor = random.uniform(1.6, 2.4)  
-    SpO2 = 95 + (V_sensor - 2.0) * (5 / 0.4)
+    V_sensor = random.uniform(1.6, 2.6)  # Aumentado para ampliar a faixa
+    SpO2 = 94 + (V_sensor - 2.0) * (10 / 1.0)  # Ajuste para cobrir 90-99%
+    SpO2 = max(90.0, min(SpO2, 99.0))  # Garante os limites
     return round(SpO2, 1)
 
 def temperatura_ambiente():
@@ -52,7 +53,6 @@ def umidade():
     RH = (V_sensor / V_max) * 100
     return RH
 
-
 pessoas = random.randint(40, 150)
 
 def visao_computacional():
@@ -68,7 +68,8 @@ pacientes = cursor.fetchall()
 if not pacientes:
     print("Nenhum paciente encontrado na base de dados.")
 else:
-    NUM_MEDICOES = 1000
+    # Caso sejam poucos dados teremos de apartar a geração dos dados para cada sensor ou grafico
+    NUM_MEDICOES = 7
 
     for paciente in pacientes:
         id_paciente = paciente[0]

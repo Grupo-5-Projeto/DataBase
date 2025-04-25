@@ -68,8 +68,6 @@ INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, latitude, longit
 ('04377-036', 'R. Cidade de Bagdá', 'Vila Santa Catarina', 529, 'São Paulo', 'SP', -23.656628497233307, -46.653536503660234,'U')
 ;
 
-select * from endereco;
-select * from upa;
 -- Cadastrando UPAs da Cidade de São Paulo
 INSERT INTO upa (nome, cnpj, telefone, capacidade_atendimento, fk_endereco) VALUES 
 ('UPA 21 DE JUNHO', '12345678000195', '1139755866', 100, 30),
@@ -144,19 +142,6 @@ INSERT INTO tempo_espera (tempo_espera, fk_upa) VALUES
 (22, 33),
 (46, 34);
 
-SELECT 
-    u.id_upa,
-    u.nome AS nome_upa,
-    t.tempo_espera,
-    e.rua,
-    e.numero,
-    e.bairro,
-    e.cidade,
-    e.estado
-FROM upa u
-LEFT JOIN tempo_espera t ON u.id_upa = t.fk_upa
-LEFT JOIN endereco e ON u.fk_endereco = e.id_endereco;
-
 -- Mockando pacientes da Cidade de São Paulo
 INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa) VALUES
 ('Ana Souza', '22813945182', '1990-05-12', '123456789012345', 1, 1),
@@ -189,4 +174,55 @@ INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_
 ('Beatriz Campos', '27369041587', '1993-08-26', '191919191919191', 28, 2),
 ('Caio Barreto', '74168052901', '1997-12-21', '202020202020202', 29, 3);
 
+-- Mockando pacientes com fk_upa = 1
+INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa) VALUES
+('Amanda Ribeiro', '83946275108', '1991-04-15', '300000000000001', 30, 1),
+('Bruno Costa', '76298415320', '1989-11-02', '300000000000002', 31, 1),
+('Camila Silva', '10475893642', '1995-06-10', '300000000000003', 32, 1),
+('Diego Martins', '47382916507', '1987-09-30', '300000000000004', 33, 1),
+('Elaine Teixeira', '96832017456', '1993-01-22', '300000000000005', 34, 1),
+('Felipe Souza', '39285746190', '2000-12-08', '300000000000006', 35, 1),
+('Gisele Farias', '10729483569', '1986-03-11', '300000000000007', 36, 1),
+('Henrique Lopes', '56823974012', '1992-07-04', '300000000000008', 37, 1),
+('Isabela Rocha', '61473820593', '1997-10-18', '300000000000009', 38, 1),
+('João Pedro Almeida', '84016592734', '1984-05-27', '300000000000010', 39, 1),
+('Karen Oliveira', '21947386051', '1990-08-16', '300000000000011', 40, 1),
+('Leonardo Nunes', '39784026518', '1996-02-03', '300000000000012', 41, 1),
+('Manuela Lima', '75932086417', '1994-11-09', '300000000000013', 42, 1),
+('Nathan Vieira', '82169037485', '1988-06-21', '300000000000014', 43, 1),
+('Olívia Duarte', '67538491026', '1999-01-14', '300000000000015', 44, 1),
+('Pedro Henrique', '98021374569', '1991-03-05', '300000000000016', 45, 1),
+('Queila Menezes', '31092874562', '1985-07-30', '300000000000017', 46, 1),
+('Renan Batista', '58017634920', '1993-09-19', '300000000000018', 47, 1),
+('Simone Araújo', '92657381047', '1998-12-25', '300000000000019', 48, 1),
+('Tiago Ramos', '49302817562', '1987-10-01', '300000000000020', 49, 1);
 
+
+-- selects uteis
+
+SELECT 
+	u.id_upa as id_upa,
+    u.nome AS nome_upa,
+    p.nome AS nome_paciente,
+    tp.data_hora AS data_temp,
+    tp.valor AS temperatura,
+    o.data_hora AS data_oxi,
+    o.valor AS oximetria
+FROM paciente p
+JOIN temperatura_paciente tp ON p.id_paciente = tp.fk_paciente
+JOIN oximetro o ON p.id_paciente = o.fk_paciente
+JOIN upa u ON p.fk_upa = u.id_upa
+WHERE u.id_upa = 1;
+
+SELECT 
+    u.id_upa,
+    u.nome AS nome_upa,
+    t.tempo_espera,
+    e.rua,
+    e.numero,
+    e.bairro,
+    e.cidade,
+    e.estado
+FROM upa u
+LEFT JOIN tempo_espera t ON u.id_upa = t.fk_upa
+LEFT JOIN endereco e ON u.fk_endereco = e.id_endereco;
