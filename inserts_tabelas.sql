@@ -198,6 +198,40 @@ INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_
 ('Tiago Ramos', '49302817562', '1987-10-01', '300000000000020', 49, 1);
 
 
+-- Janeiro: Médias mais baixas (~35.5°C)
+INSERT INTO temperatura_paciente (data_hora, valor, fk_paciente) VALUES
+('2025-01-10 08:30:00', 35.2, 1),
+('2025-01-15 09:00:00', 35.5, 2),
+('2025-01-20 10:30:00', 35.7, 3),
+('2025-01-25 11:00:00', 35.6, 4),
+('2025-01-30 12:00:00', 35.4, 5);
+
+-- Fevereiro: Médias moderadas (~36.0°C)
+INSERT INTO temperatura_paciente (data_hora, valor, fk_paciente) VALUES
+('2025-02-05 08:30:00', 36.0, 6),
+('2025-02-10 09:00:00', 36.1, 7),
+('2025-02-15 10:30:00', 35.9, 8),
+('2025-02-20 11:00:00', 36.2, 9),
+('2025-02-25 12:00:00', 36.0, 10);
+
+-- Março: Médias altas (~37.2°C)
+INSERT INTO temperatura_paciente (data_hora, valor, fk_paciente) VALUES
+('2025-03-05 08:30:00', 37.0, 11),
+('2025-03-10 09:00:00', 37.3, 12),
+('2025-03-15 10:30:00', 37.1, 13),
+('2025-03-20 11:00:00', 37.5, 14),
+('2025-03-25 12:00:00', 37.2, 15);
+
+-- Abril: Médias ainda mais altas (~38.0°C)
+INSERT INTO temperatura_paciente (data_hora, valor, fk_paciente) VALUES
+('2025-04-05 08:30:00', 38.1, 16),
+('2025-04-10 09:00:00', 37.9, 17),
+('2025-04-15 10:30:00', 38.2, 18),
+('2025-04-20 11:00:00', 38.0, 19),
+('2025-04-25 12:00:00', 38.1, 20);
+
+
+
 -- selects uteis
 
 SELECT 
