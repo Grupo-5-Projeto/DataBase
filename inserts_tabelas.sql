@@ -196,33 +196,3 @@ INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_
 ('Renan Batista', '58017634920', '1993-09-19', '300000000000018', 47, 1),
 ('Simone Araújo', '92657381047', '1998-12-25', '300000000000019', 48, 1),
 ('Tiago Ramos', '49302817562', '1987-10-01', '300000000000020', 49, 1);
-
-
--- selects uteis
-
-SELECT 
-	u.id_upa as id_upa,
-    u.nome AS nome_upa,
-    p.nome AS nome_paciente,
-    tp.data_hora AS data_temp,
-    tp.valor AS temperatura,
-    o.data_hora AS data_oxi,
-    o.valor AS oximetria
-FROM paciente p
-JOIN temperatura_paciente tp ON p.id_paciente = tp.fk_paciente
-JOIN oximetro o ON p.id_paciente = o.fk_paciente
-JOIN upa u ON p.fk_upa = u.id_upa
-WHERE u.id_upa = 1;
-
-SELECT 
-    u.id_upa,
-    u.nome AS nome_upa,
-    t.tempo_espera,
-    e.rua,
-    e.numero,
-    e.bairro,
-    e.cidade,
-    e.estado
-FROM upa u
-LEFT JOIN tempo_espera t ON u.id_upa = t.fk_upa
-LEFT JOIN endereco e ON u.fk_endereco = e.id_endereco;
