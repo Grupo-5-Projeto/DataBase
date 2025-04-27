@@ -92,7 +92,7 @@ FOREIGN KEY (fk_paciente) REFERENCES paciente(id_paciente)
 CREATE TABLE biometria (
 id_biometria INT PRIMARY KEY AUTO_INCREMENT, 
 data_hora DATETIME,
-biometria_hash VARCHAR(64),
+biometria BLOB,
 fk_paciente INT,
 FOREIGN KEY (fk_paciente) REFERENCES paciente(id_paciente)
 );
