@@ -28,11 +28,13 @@ LEFT JOIN endereco e ON u.fk_endereco = e.id_endereco;
 
 
 -- visualização dos dados gerados pelas simulações
+select * from temperatura_ambiente where fk_upa = 3;
 select * from temperatura_ambiente;
 select * from umidade;
 
 select * from temperatura_paciente;
 select * from oximetro;
+
 
 select * from camera_computacional;
 select * from biometria;
@@ -40,6 +42,7 @@ select * from biometria;
 select * from paciente;
 select * from endereco;
 
+select * from upa;
 -- visualização dos valores fora do range
 select * from temperatura_ambiente where valor < 22 or valor > 24;
 select * from umidade where valor < 40 or valor > 60;
