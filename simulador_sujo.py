@@ -188,9 +188,7 @@ def inserir_dados(cursor, tabela, dados):
 
 def gerar_biometria_r503():
     """Simula a leitura de uma biometria do sensor R503."""
-    # O sensor R503 retorna um template binário da digital.
-    # Para simulação, vamos gerar uma sequência aleatória de bytes.
-    tamanho_template = random.randint(300, 500)  # Tamanho típico do template
+    tamanho_template = random.randint(300, 500)
     return random.randbytes(tamanho_template)
 
 def inserir_biometria(cursor, data_hora, biometria_data, fk_paciente):
@@ -206,8 +204,13 @@ def inserir_biometria(cursor, data_hora, biometria_data, fk_paciente):
 def buscar_biometrias(cursor):
     """Busca todas as biometrias existentes no banco."""
     cursor.execute("SELECT biometria FROM biometria")
-    return [row[0] for row in cursor.fetchall()]
+    return [row[0] for row in cursor.fetchall() if row[0]]
 
+def buscar_paciente_por_biometria(cursor, biometria):
+    """Busca o ID do paciente pela biometria."""
+    cursor.execute("SELECT fk_paciente FROM biometria WHERE biometria = %s", (biometria,))
+    resultado = cursor.fetchone()
+    return resultado[0] if resultado else None
 
 def inserir_paciente(cursor, nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa):
     """Insere um novo paciente no banco de dados."""
@@ -230,9 +233,20 @@ def inserir_endereco(cursor, cep, rua, bairro, numero, cidade, estado, latitude,
         print(f"Erro ao inserir endereço: {e}")
         return None
 
+def formatar_cep(cep):
+    # Remove quaisquer espaços ou caracteres não numéricos
+    cep = ''.join(filter(str.isdigit, cep))
+    
+    # Verifica se o CEP tem o tamanho correto
+    if len(cep) != 8:
+        raise ValueError("O CEP deve conter exatamente 8 dígitos.")
+    
+    # Adiciona o hífen no local correto
+    return f"{cep[:5]}-{cep[5:]}"
+
 def gerar_endereco_sao_paulo():
     """Gera um endereço aleatório na cidade de São Paulo."""
-    cep = fake.postcode()
+    cep = formatar_cep(fake.postcode())
     rua = fake.street_name()
     bairro = fake.bairro()
     numero = fake.building_number()
@@ -249,88 +263,43 @@ try:
     conexao = pymysql.connect(**CONFIG_BD)
     cursor = conexao.cursor()
 
-    NUMERO_PACIENTES_BIOMETRIA = 49
-    cursor.execute("SELECT fk_paciente, biometria FROM biometria LIMIT %s", (NUMERO_PACIENTES_BIOMETRIA,))
-    biometrias_existentes = {row[1]: row[0] for row in cursor.fetchall() if row[1]} # Mapa de biometria para id_paciente        
-    print("Gerando dados de biometria...")
-    agora_biometria = datetime.now()
-    data_hora_biometria = agora_biometria.strftime('%Y-%m-%d %H:%M:%S')
+    NUMERO_ITERACOES = 50
 
-    for i in range(NUMERO_PACIENTES_BIOMETRIA):
-        # Decidir se vamos usar uma biometria existente (se houver) ou criar uma nova
-        usar_existente = random.random() < 0.5
+    for _ in range(NUMERO_ITERACOES):
+        # Simula a decisão se o paciente é cadastrado ou não (50% para cada)
+        eh_cadastrado = random.random() < 0.5
+        agora = datetime.now()
+        data_hora_registro = agora.strftime('%Y-%m-%d %H:%M:%S')
 
-        if usar_existente and biometrias_existentes:
-            biometria_selecionada = random.choice(list(biometrias_existentes.keys()))
-            fk_paciente_existente = biometrias_existentes[biometria_selecionada]
-            inserir_sucesso = inserir_biometria(cursor, data_hora_biometria, biometria_selecionada, fk_paciente_existente)
-            if inserir_sucesso:
-                print(f"Biometria existente inserida para paciente {fk_paciente_existente} em {data_hora_biometria}.")
+        if eh_cadastrado:
+            print("Paciente cadastrado.")
         else:
-            # Gerar nova biometria e novo paciente
-            nova_biometria = gerar_biometria_r503()
+            # Processar como um novo paciente
+            print("Paciente não cadastrado. Gerando endereço, biometria e inserindo no banco.")
+            # Gerar endereço
             cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade = gerar_endereco_sao_paulo()
             endereco_id = inserir_endereco(cursor, cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade)
             if endereco_id:
+                # Gerar dados do paciente e inserir
                 novo_paciente_id = inserir_paciente(cursor, fake.name(), extrair_numeros_cpf(fake.cpf()), fake.date_of_birth(minimum_age=18, maximum_age=80), fake.ssn(), endereco_id, random.randint(1, 34))
                 if novo_paciente_id:
-                    inserir_sucesso_nova = inserir_biometria(cursor, data_hora_biometria, nova_biometria, novo_paciente_id)
-                    if inserir_sucesso_nova:
-                        print(f"Nova biometria inserida para novo paciente {novo_paciente_id} em {data_hora_biometria}.")
+                    # Gerar biometria e inserir
+                    nova_biometria = gerar_biometria_r503()
+                    inserir_sucesso_biometria = inserir_biometria(cursor, data_hora_registro, nova_biometria, novo_paciente_id)
+                    if inserir_sucesso_biometria:
+                        print(f"Novo paciente (ID: {novo_paciente_id}) cadastrado com biometria.")
+                    else:
+                        print(f"Erro ao inserir biometria para o novo paciente (ID: {novo_paciente_id}).")
                 else:
                     print("Erro ao inserir novo paciente.")
             else:
                 print("Erro ao inserir novo endereço.")
 
     conexao.commit()
-    print("Dados de biometria (existente e novos) inseridos com sucesso.")
+    print(f"\nProcessamento de biometria concluído para {NUMERO_ITERACOES} iterações.")
 
-    # Recarregar as biometrias existentes após a inserção inicial
-    cursor.execute("SELECT fk_paciente, biometria FROM biometria")
-    biometrias_existentes = {row[1]: row[0] for row in cursor.fetchall() if row[1]}
-
-    cursor.execute("SELECT id_paciente FROM paciente")
-    ids_pacientes = [row[0] for row in cursor.fetchall()]
-
-    if not ids_pacientes:
-        print("Nenhum paciente encontrado na base de dados.")
-    elif len(ids_pacientes) != NUMERO_PACIENTES_BIOMETRIA + (NUMERO_PACIENTES_BIOMETRIA // 2 if biometrias_existentes else NUMERO_PACIENTES_BIOMETRIA):
-        print(f"Atenção: O número de pacientes na base de dados ({len(ids_pacientes)}) pode não ser o esperado.")
-    else:
-        print("Gerando dados de biometria adicionais para os pacientes...")
-        agora = datetime.now()
-        data_hora_registro = agora.strftime('%Y-%m-%d %H:%M:%S')
-
-        for id_paciente in ids_pacientes:
-            biometria_gerada = gerar_biometria_r503()
-            inserir_sucesso = inserir_biometria(cursor, data_hora_registro, biometria_gerada, id_paciente)
-            if inserir_sucesso:
-                print(f"Biometria adicional gerada e inserida para o paciente {id_paciente} em {data_hora_registro}.")
-
-        conexao.commit()
-        print("Dados de biometria adicionais inseridos com sucesso.")
-
-    # Buscar os IDs dos pacientes na base de dados
-    cursor.execute("SELECT id_paciente FROM paciente LIMIT %s", (NUMERO_PACIENTES_BIOMETRIA,))
-    ids_pacientes = [row[0] for row in cursor.fetchall()]
-
-    if not ids_pacientes:
-        print("Nenhum paciente encontrado na base de dados para gerar biometria.")
-    elif len(ids_pacientes) != NUMERO_PACIENTES_BIOMETRIA:
-        print(f"Atenção: O número de pacientes encontrados ({len(ids_pacientes)}) é diferente do esperado ({NUMERO_PACIENTES_BIOMETRIA}).")
-    else:
-        print("Gerando dados de biometria para os pacientes...")
-        agora = datetime.now()
-        data_hora_registro = agora.strftime('%Y-%m-%d %H:%M:%S')
-
-        for id_paciente in ids_pacientes:
-            biometria_gerada = gerar_biometria_r503()
-            inserir_sucesso = inserir_biometria(cursor, data_hora_registro, biometria_gerada, id_paciente)
-            if inserir_sucesso:
-                print(f"Biometria gerada e inserida para o paciente {id_paciente} em {data_hora_registro}.")
-
-        conexao.commit()
-        print("Dados de biometria inseridos com sucesso.")
+    conexao.commit()
+    print("Dados de biometria inseridos com sucesso.")
 
 
     cursor.execute("SELECT id_paciente FROM paciente")
