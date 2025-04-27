@@ -35,6 +35,7 @@ select * from umidade;
 select * from temperatura_paciente;
 select * from oximetro;
 
+
 select * from camera_computacional;
 select * from biometria;
 
