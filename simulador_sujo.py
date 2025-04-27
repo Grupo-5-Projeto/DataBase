@@ -13,8 +13,8 @@ CONFIG_BD = {
     'database': 'upa_connect'
 }
 
-# Parâmetros da simulação (agora relevantes apenas para os dados da UPA)
-PERIODO_SIMULACAO_HORAS = 48
+# Parâmetros da simulação
+PERIODO_SIMULACAO_HORAS = 24
 INTERVALO_MINUTOS = 5
 NUMERO_AMOSTRAS = (PERIODO_SIMULACAO_HORAS * 60) // INTERVALO_MINUTOS
 
@@ -39,7 +39,7 @@ def gerar_valor_sujo(valor_original, taxa_ruido=0.02, prob_faltante=0.05, desvio
     if random.random() < prob_faltante and not isinstance(valor_sujo, int):
         return None
 
-    return valor_sujo # Removemos a lógica de outlier daqui, trataremos nas funções específicas
+    return valor_sujo
 
 def gerar_temp_corporal_suja():
     global falha_temp_paciente
@@ -47,34 +47,34 @@ def gerar_temp_corporal_suja():
         falha_temp_paciente -= 1
         return None
     else:
-        temp_celsius_original = round(random.uniform(36.0, 37.5), 1) # Limitar a 1 casa decimal
+        temp_celsius_original = round(random.uniform(36.0, 37.5), 1)
         resultado = gerar_valor_sujo(temp_celsius_original, taxa_ruido=0.01, prob_faltante=0.1, desvio_outlier=4, minimo=30.0, maximo=45.0, prob_iniciar_falha=0.003, duracao_max_falha=12)
         if isinstance(resultado, int):
             falha_temp_paciente = resultado
             return None
-        return round(resultado, 1) if resultado is not None else None # Limitar a 1 casa decimal
+        return round(resultado, 1) if resultado is not None else None
 
 def gerar_oximetro_sujo():
     global falha_oximetro
-    prob_outlier_oximetro = 0.01 # Probabilidade de gerar um outlier no oximetro
+    prob_outlier_oximetro = 0.01
 
     if falha_oximetro > 0:
         falha_oximetro -= 1
         return None
     else:
         if random.random() < prob_outlier_oximetro:
-            # Gerar um outlier de oximetro
             if random.random() < 0.5:
-                return round(random.uniform(50.0, 85.0), 0) # Limitar a 0 casa decimal (inteiro)
+                return round(random.uniform(50.0, 85.0), 0)
             else:
-                return round(random.uniform(101.0, 110.0), 0) # Limitar a 0 casa decimal (inteiro)
+                return round(random.uniform(101.0, 110.0), 0)
         else:
-            spo2_original = round(random.uniform(95.0, 99.0), 0) # Limitar a 0 casa decimal (inteiro)
+            spo2_original = round(random.uniform(95.0, 99.0), 0)
             resultado = gerar_valor_sujo(spo2_original, taxa_ruido=0.005, prob_faltante=0.07, minimo=70.0, maximo=105.0, prob_iniciar_falha=0.004, duracao_max_falha=10)
             if isinstance(resultado, int):
                 falha_oximetro = resultado
                 return None
-            return round(resultado, 0) if resultado is not None else None # Limitar a 0 casa decimal
+            return round(resultado, 0) if resultado is not None else None
+
 
 def gerar_temp_ambiente_suja():
     global falha_temp_ambiente, ultima_temp_ambiente
@@ -180,11 +180,11 @@ def inserir_dados(cursor, tabela, dados):
     sql = f"INSERT INTO {tabela} ({campos}) VALUES ({valores})"
     try:
         cursor.execute(sql, list(dados.values()))
+        return True
     except pymysql.err.DataError as e:
         print(f"Erro ao inserir em {tabela}: {e}")
         print(f"Dados problemáticos: {dados}")
         return False
-    return True
 
 def gerar_biometria_r503():
     """Simula a leitura de uma biometria do sensor R503."""
@@ -236,11 +236,11 @@ def inserir_endereco(cursor, cep, rua, bairro, numero, cidade, estado, latitude,
 def formatar_cep(cep):
     # Remove quaisquer espaços ou caracteres não numéricos
     cep = ''.join(filter(str.isdigit, cep))
-    
+
     # Verifica se o CEP tem o tamanho correto
     if len(cep) != 8:
         raise ValueError("O CEP deve conter exatamente 8 dígitos.")
-    
+
     # Adiciona o hífen no local correto
     return f"{cep[:5]}-{cep[5:]}"
 
@@ -263,7 +263,7 @@ try:
     conexao = pymysql.connect(**CONFIG_BD)
     cursor = conexao.cursor()
 
-    NUMERO_ITERACOES = 50
+    NUMERO_ITERACOES = 10 # Reduzi para testes, pode aumentar depois
 
     for _ in range(NUMERO_ITERACOES):
         # Simula a decisão se o paciente é cadastrado ou não (50% para cada)
@@ -298,67 +298,82 @@ try:
     conexao.commit()
     print(f"\nProcessamento de biometria concluído para {NUMERO_ITERACOES} iterações.")
 
-    conexao.commit()
-    print("Dados de biometria inseridos com sucesso.")
-
-
+    # Buscar todos os IDs dos pacientes cadastrados
     cursor.execute("SELECT id_paciente FROM paciente")
     ids_pacientes = [row[0] for row in cursor.fetchall()]
 
     if not ids_pacientes:
         print("Nenhum paciente encontrado na base de dados.")
-    elif len(ids_pacientes) != 49:
-        print(f"Atenção: O número de pacientes na base de dados ({len(ids_pacientes)}) é diferente do esperado (49).")
     else:
-        print("Gerando dados para 48 horas da UPA (temperatura, umidade e câmera)...")
-        agora = datetime.now()
-
-        for i in range(NUMERO_AMOSTRAS):
-            timestamp = agora - timedelta(minutes=INTERVALO_MINUTOS * (NUMERO_AMOSTRAS - 1 - i))
-            data_hora_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-
-            # Dados da UPA
-            temp_ambiente = gerar_temp_ambiente_suja()
-            dados_temp_ambiente = {'data_hora': data_hora_str, 'valor': temp_ambiente, 'fk_upa': 1}
-            inserir_sucesso_temp_ambiente = inserir_dados(cursor, 'temperatura_ambiente', dados_temp_ambiente)
-            # if inserir_sucesso_temp_ambiente:
-            #     print(f"UPA Temp Ambiente [{data_hora_str}]: {temp_ambiente}°C")
-
-            umidade = gerar_umidade_suja()
-            dados_umidade = {'data_hora': data_hora_str, 'valor': umidade, 'fk_upa': 1}
-            inserir_sucesso_umidade = inserir_dados(cursor, 'umidade', dados_umidade)
-            # if inserir_sucesso_umidade:
-            #     print(f"UPA Umidade [{data_hora_str}]: {umidade}%")
-
-            qtd_pessoas = gerar_contagem_pessoas_suja()
-            dados_camera = {'data_hora': data_hora_str, 'qtd_pessoas': qtd_pessoas, 'fk_upa': 1}
-            inserir_sucesso_camera = inserir_dados(cursor, 'camera_computacional', dados_camera)
-            # if inserir_sucesso_camera:
-            #     print(f"UPA Câmera [{data_hora_str}]: {qtd_pessoas} pessoas")
-
-        print("Dados da UPA (temperatura, umidade e câmera) para 48 horas inseridos.")
-
-        print("Gerando um registro de temperatura e oximetria por paciente...")
-        agora_paciente = datetime.now()
-        data_hora_registro = agora_paciente.strftime('%Y-%m-%d %H:%M:%S') # Usar o mesmo timestamp para todos os registros
+        print("Gerando e inserindo um dado de oximetria e temperatura para cada paciente...")
+        agora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         for id_paciente in ids_pacientes:
-            # Gera um valor de temperatura e oximetria para cada paciente
-            temp_paciente_valor = gerar_temp_corporal_suja()
-            dados_temp_paciente = {'data_hora': data_hora_registro, 'valor': temp_paciente_valor, 'fk_paciente': id_paciente}
-            inserir_sucesso_temp_paciente = inserir_dados(cursor, 'temperatura_paciente', dados_temp_paciente)
-            if inserir_sucesso_temp_paciente:
-                print(f"Paciente {id_paciente} Temp: {temp_paciente_valor}°C")
+            print(f"Processando paciente ID: {id_paciente}")
 
-            oximetro_valor = gerar_oximetro_sujo()
-            dados_oximetro = {'data_hora': data_hora_registro, 'valor': oximetro_valor, 'fk_paciente': id_paciente}
-            inserir_sucesso_oximetro = inserir_dados(cursor, 'oximetro', dados_oximetro)
-            if inserir_sucesso_oximetro:
-                print(f"Paciente {id_paciente} Oximetria: {oximetro_valor}%")
+            # Resetar as variáveis de falha para cada paciente
+            falha_temp_paciente = 0
+            falha_oximetro = 0
 
-        print("Um registro de temperatura e oximetria foi inserido para cada paciente.")
+            # Gerar e inserir temperatura corporal
+            temp_valor = gerar_temp_corporal_suja()
+
+            dados_temp = {'data_hora': agora, 'valor': temp_valor, 'fk_paciente': id_paciente}
+            inserir_dados(cursor, 'temperatura_paciente', dados_temp)
+            print(f"  Temperatura: {temp_valor}°C")
+
+
+            # Gerar e inserir oximetria
+            oxi_valor = gerar_oximetro_sujo()
+
+            dados_oxi = {'data_hora': agora, 'valor': oxi_valor, 'fk_paciente': id_paciente}
+            inserir_dados(cursor, 'oximetro', dados_oxi)
+            print(f"  Oximetria: {oxi_valor}%")
+
 
         conexao.commit()
+        print("Dados de oximetria e temperatura gerados e inseridos para todos os pacientes.")
+
+    # Buscar todos os IDs das UPAs cadastradas
+    cursor.execute("SELECT id_upa FROM upa")
+    ids_upas = [row[0] for row in cursor.fetchall()]
+
+    if not ids_upas:
+        print("Nenhuma UPA encontrada na base de dados.")
+    else:
+        print("Gerando dados da UPA (temperatura, umidade e câmera) para todas as UPAs por 48 horas...")
+        agora_upa = datetime.now()
+        for id_upa in ids_upas:
+            print(f"Processando dados da UPA ID: {id_upa}")
+            # Resetar as variáveis de falha para cada UPA
+            falha_temp_ambiente = 0
+            falha_umidade = 0
+            falha_visao = 0
+            ultima_temp_ambiente = None
+            ultima_umidade = None
+
+            for i in range(NUMERO_AMOSTRAS):
+                timestamp = agora_upa - timedelta(minutes=INTERVALO_MINUTOS * (NUMERO_AMOSTRAS - 1 - i))
+                data_hora_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
+                # Dados da UPA - Temperatura Ambiente
+                temp_ambiente = gerar_temp_ambiente_suja()
+                dados_temp_ambiente = {'data_hora': data_hora_str, 'valor': temp_ambiente, 'fk_upa': id_upa}
+                inserir_dados(cursor, 'temperatura_ambiente', dados_temp_ambiente)
+
+                # Dados da UPA - Umidade
+                umidade = gerar_umidade_suja()
+                dados_umidade = {'data_hora': data_hora_str, 'valor': umidade, 'fk_upa': id_upa}
+                inserir_dados(cursor, 'umidade', dados_umidade)
+
+                # Dados da UPA - Câmera Computacional
+                qtd_pessoas = gerar_contagem_pessoas_suja()
+                dados_camera = {'data_hora': data_hora_str, 'qtd_pessoas': qtd_pessoas, 'fk_upa': id_upa}
+                inserir_dados(cursor, 'camera_computacional', dados_camera)
+
+        print("Dados da UPA (temperatura, umidade e câmera) para todas as UPAs por 48 horas inseridos.")
+
+    conexao.commit()
 
 except pymysql.err.Error as e:
     print(f"Erro de banco de dados: {e}")
