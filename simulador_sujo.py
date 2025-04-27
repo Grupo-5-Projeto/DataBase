@@ -1,6 +1,9 @@
 import random
 import pymysql
 from datetime import datetime, timedelta
+from faker import Faker
+
+fake = Faker('pt_BR')
 
 # Configurações do banco de dados
 CONFIG_BD = {
@@ -183,9 +186,152 @@ def inserir_dados(cursor, tabela, dados):
         return False
     return True
 
+def gerar_biometria_r503():
+    """Simula a leitura de uma biometria do sensor R503."""
+    # O sensor R503 retorna um template binário da digital.
+    # Para simulação, vamos gerar uma sequência aleatória de bytes.
+    tamanho_template = random.randint(300, 500)  # Tamanho típico do template
+    return random.randbytes(tamanho_template)
+
+def inserir_biometria(cursor, data_hora, biometria_data, fk_paciente):
+    """Insere os dados de biometria na tabela."""
+    sql = "INSERT INTO biometria (data_hora, biometria, fk_paciente) VALUES (%s, %s, %s)"
+    try:
+        cursor.execute(sql, (data_hora, biometria_data, fk_paciente))
+        return True
+    except pymysql.err.Error as e:
+        print(f"Erro ao inserir biometria para paciente {fk_paciente}: {e}")
+        return False
+
+def buscar_biometrias(cursor):
+    """Busca todas as biometrias existentes no banco."""
+    cursor.execute("SELECT biometria FROM biometria")
+    return [row[0] for row in cursor.fetchall()]
+
+
+def inserir_paciente(cursor, nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa):
+    """Insere um novo paciente no banco de dados."""
+    sql = "INSERT INTO paciente (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa) VALUES (%s, %s, %s, %s, %s, %s)"
+    try:
+        cursor.execute(sql, (nome, cpf, data_nascimento, carteira_sus, fk_endereco, fk_upa))
+        print(f"PACIENTE INSERIDO com ID: {cursor.lastrowid}")
+        return cursor.lastrowid
+    except pymysql.err.Error as e:
+        print(f"Erro ao inserir paciente: {e}")
+        return None
+
+def inserir_endereco(cursor, cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade_referenciada):
+    """Insere um novo endereço no banco de dados."""
+    sql = "INSERT INTO endereco (cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade_referenciada) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    try:
+        cursor.execute(sql, (cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade_referenciada))
+        return cursor.lastrowid
+    except pymysql.err.Error as e:
+        print(f"Erro ao inserir endereço: {e}")
+        return None
+
+def gerar_endereco_sao_paulo():
+    """Gera um endereço aleatório na cidade de São Paulo."""
+    cep = fake.postcode()
+    rua = fake.street_name()
+    bairro = fake.bairro()
+    numero = fake.building_number()
+    cidade = "São Paulo"
+    estado = "SP"
+    latitude = fake.latitude()
+    longitude = fake.longitude()
+    return cep, rua, bairro, numero, cidade, estado, latitude, longitude, 'P' # 'P' para Paciente
+
+def extrair_numeros_cpf(cpf):
+    return ''.join(char for char in cpf if char.isdigit())
+
 try:
     conexao = pymysql.connect(**CONFIG_BD)
     cursor = conexao.cursor()
+
+    NUMERO_PACIENTES_BIOMETRIA = 49
+    cursor.execute("SELECT fk_paciente, biometria FROM biometria LIMIT %s", (NUMERO_PACIENTES_BIOMETRIA,))
+    biometrias_existentes = {row[1]: row[0] for row in cursor.fetchall() if row[1]} # Mapa de biometria para id_paciente        
+    print("Gerando dados de biometria...")
+    agora_biometria = datetime.now()
+    data_hora_biometria = agora_biometria.strftime('%Y-%m-%d %H:%M:%S')
+
+    for i in range(NUMERO_PACIENTES_BIOMETRIA):
+        # Decidir se vamos usar uma biometria existente (se houver) ou criar uma nova
+        usar_existente = random.random() < 0.5
+
+        if usar_existente and biometrias_existentes:
+            biometria_selecionada = random.choice(list(biometrias_existentes.keys()))
+            fk_paciente_existente = biometrias_existentes[biometria_selecionada]
+            inserir_sucesso = inserir_biometria(cursor, data_hora_biometria, biometria_selecionada, fk_paciente_existente)
+            if inserir_sucesso:
+                print(f"Biometria existente inserida para paciente {fk_paciente_existente} em {data_hora_biometria}.")
+        else:
+            # Gerar nova biometria e novo paciente
+            nova_biometria = gerar_biometria_r503()
+            cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade = gerar_endereco_sao_paulo()
+            endereco_id = inserir_endereco(cursor, cep, rua, bairro, numero, cidade, estado, latitude, longitude, entidade)
+            if endereco_id:
+                novo_paciente_id = inserir_paciente(cursor, fake.name(), extrair_numeros_cpf(fake.cpf()), fake.date_of_birth(minimum_age=18, maximum_age=80), fake.ssn(), endereco_id, random.randint(1, 34))
+                if novo_paciente_id:
+                    inserir_sucesso_nova = inserir_biometria(cursor, data_hora_biometria, nova_biometria, novo_paciente_id)
+                    if inserir_sucesso_nova:
+                        print(f"Nova biometria inserida para novo paciente {novo_paciente_id} em {data_hora_biometria}.")
+                else:
+                    print("Erro ao inserir novo paciente.")
+            else:
+                print("Erro ao inserir novo endereço.")
+
+    conexao.commit()
+    print("Dados de biometria (existente e novos) inseridos com sucesso.")
+
+    # Recarregar as biometrias existentes após a inserção inicial
+    cursor.execute("SELECT fk_paciente, biometria FROM biometria")
+    biometrias_existentes = {row[1]: row[0] for row in cursor.fetchall() if row[1]}
+
+    cursor.execute("SELECT id_paciente FROM paciente")
+    ids_pacientes = [row[0] for row in cursor.fetchall()]
+
+    if not ids_pacientes:
+        print("Nenhum paciente encontrado na base de dados.")
+    elif len(ids_pacientes) != NUMERO_PACIENTES_BIOMETRIA + (NUMERO_PACIENTES_BIOMETRIA // 2 if biometrias_existentes else NUMERO_PACIENTES_BIOMETRIA):
+        print(f"Atenção: O número de pacientes na base de dados ({len(ids_pacientes)}) pode não ser o esperado.")
+    else:
+        print("Gerando dados de biometria adicionais para os pacientes...")
+        agora = datetime.now()
+        data_hora_registro = agora.strftime('%Y-%m-%d %H:%M:%S')
+
+        for id_paciente in ids_pacientes:
+            biometria_gerada = gerar_biometria_r503()
+            inserir_sucesso = inserir_biometria(cursor, data_hora_registro, biometria_gerada, id_paciente)
+            if inserir_sucesso:
+                print(f"Biometria adicional gerada e inserida para o paciente {id_paciente} em {data_hora_registro}.")
+
+        conexao.commit()
+        print("Dados de biometria adicionais inseridos com sucesso.")
+
+    # Buscar os IDs dos pacientes na base de dados
+    cursor.execute("SELECT id_paciente FROM paciente LIMIT %s", (NUMERO_PACIENTES_BIOMETRIA,))
+    ids_pacientes = [row[0] for row in cursor.fetchall()]
+
+    if not ids_pacientes:
+        print("Nenhum paciente encontrado na base de dados para gerar biometria.")
+    elif len(ids_pacientes) != NUMERO_PACIENTES_BIOMETRIA:
+        print(f"Atenção: O número de pacientes encontrados ({len(ids_pacientes)}) é diferente do esperado ({NUMERO_PACIENTES_BIOMETRIA}).")
+    else:
+        print("Gerando dados de biometria para os pacientes...")
+        agora = datetime.now()
+        data_hora_registro = agora.strftime('%Y-%m-%d %H:%M:%S')
+
+        for id_paciente in ids_pacientes:
+            biometria_gerada = gerar_biometria_r503()
+            inserir_sucesso = inserir_biometria(cursor, data_hora_registro, biometria_gerada, id_paciente)
+            if inserir_sucesso:
+                print(f"Biometria gerada e inserida para o paciente {id_paciente} em {data_hora_registro}.")
+
+        conexao.commit()
+        print("Dados de biometria inseridos com sucesso.")
+
 
     cursor.execute("SELECT id_paciente FROM paciente")
     ids_pacientes = [row[0] for row in cursor.fetchall()]
@@ -206,20 +352,20 @@ try:
             temp_ambiente = gerar_temp_ambiente_suja()
             dados_temp_ambiente = {'data_hora': data_hora_str, 'valor': temp_ambiente, 'fk_upa': 1}
             inserir_sucesso_temp_ambiente = inserir_dados(cursor, 'temperatura_ambiente', dados_temp_ambiente)
-            if inserir_sucesso_temp_ambiente:
-                print(f"UPA Temp Ambiente [{data_hora_str}]: {temp_ambiente}°C")
+            # if inserir_sucesso_temp_ambiente:
+            #     print(f"UPA Temp Ambiente [{data_hora_str}]: {temp_ambiente}°C")
 
             umidade = gerar_umidade_suja()
             dados_umidade = {'data_hora': data_hora_str, 'valor': umidade, 'fk_upa': 1}
             inserir_sucesso_umidade = inserir_dados(cursor, 'umidade', dados_umidade)
-            if inserir_sucesso_umidade:
-                print(f"UPA Umidade [{data_hora_str}]: {umidade}%")
+            # if inserir_sucesso_umidade:
+            #     print(f"UPA Umidade [{data_hora_str}]: {umidade}%")
 
             qtd_pessoas = gerar_contagem_pessoas_suja()
             dados_camera = {'data_hora': data_hora_str, 'qtd_pessoas': qtd_pessoas, 'fk_upa': 1}
             inserir_sucesso_camera = inserir_dados(cursor, 'camera_computacional', dados_camera)
-            if inserir_sucesso_camera:
-                print(f"UPA Câmera [{data_hora_str}]: {qtd_pessoas} pessoas")
+            # if inserir_sucesso_camera:
+            #     print(f"UPA Câmera [{data_hora_str}]: {qtd_pessoas} pessoas")
 
         print("Dados da UPA (temperatura, umidade e câmera) para 48 horas inseridos.")
 
