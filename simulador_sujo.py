@@ -54,19 +54,32 @@ def gerar_leituras_proximas(valor_central, num_leituras=3, desvio_max=0.2, prob_
 
 def gerar_temp_corporal_suja_multipla():
     global falha_temp_paciente
+    prob_outlier_temp = 0.05 # Aumentando a probabilidade de outliers de temperatura
+
     if falha_temp_paciente > 0:
         falha_temp_paciente -= 1
         return [None] * 3
     else:
-        temp_celsius_original = round(random.uniform(36.0, 37.5), 1)
-        primeiro_resultado = gerar_valor_sujo(temp_celsius_original, taxa_ruido=0.01, prob_faltante=0.3, desvio_outlier=4, minimo=30.0, maximo=45.0, prob_iniciar_falha=0.003, duracao_max_falha=12)
-        if isinstance(primeiro_resultado, int):
-            falha_temp_paciente = primeiro_resultado
-            return [None] * 3
-        elif primeiro_resultado is None:
-            return [None, round(random.uniform(36.0, 37.5), 1), round(random.uniform(36.0, 37.5), 1)]
+        if random.random() < prob_outlier_temp:
+            # Gerar um outlier de temperatura significativo
+            tipo_outlier = random.random()
+            if tipo_outlier < 0.33:
+                outlier = round(random.uniform(-10.0, 33.9), 1) # Temperaturas muito baixas
+            elif tipo_outlier < 0.66:
+                outlier = round(random.uniform(38.0, 99.0), 1) # Temperaturas muito altas
+            else:
+                outlier = round(random.uniform(46.0, 60.0), 1) # Temperaturas extremamente altas
+            return [outlier, round(outlier + random.uniform(-0.5, 0.5), 1), round(outlier + random.uniform(-0.5, 0.5), 1)]
         else:
-            return [round(primeiro_resultado, 1), round(primeiro_resultado + random.uniform(-0.1, 0.1), 1), round(primeiro_resultado + random.uniform(-0.1, 0.1), 1)]
+            temp_celsius_original = round(random.uniform(36.0, 37.5), 1)
+            primeiro_resultado = gerar_valor_sujo(temp_celsius_original, taxa_ruido=0.01, prob_faltante=0.3, desvio_outlier=4, minimo=30.0, maximo=45.0, prob_iniciar_falha=0.003, duracao_max_falha=12)
+            if isinstance(primeiro_resultado, int):
+                falha_temp_paciente = primeiro_resultado
+                return [None] * 3
+            elif primeiro_resultado is None:
+                return [None, round(random.uniform(36.0, 37.5), 1), round(random.uniform(36.0, 37.5), 1)]
+            else:
+                return [round(primeiro_resultado, 1), round(primeiro_resultado + random.uniform(-0.1, 0.1), 1), round(primeiro_resultado + random.uniform(-0.1, 0.1), 1)]
 
 def gerar_oximetro_sujo_multipla():
     global falha_oximetro
@@ -265,7 +278,7 @@ def formatar_cep(cep):
 def gerar_endereco_sao_paulo():
     """Gera um endereço aleatório na cidade de São Paulo."""
     cep = formatar_cep(fake.postcode())
-    rua = fake
+    rua = fake.street_name()
     bairro = fake.bairro()
     numero = fake.building_number()
     cidade = "São Paulo"
