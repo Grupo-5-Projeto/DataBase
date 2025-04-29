@@ -1,5 +1,6 @@
 import random
 import pymysql
+import math
 from datetime import datetime, timedelta
 from faker import Faker
 
@@ -52,6 +53,13 @@ def gerar_leituras_proximas(valor_central, num_leituras=3, desvio_max=0.2, prob_
             leituras.append(round(valor_central + desvio, 1))
     return leituras
 
+A = 0.001129148
+B = 0.000234125
+C = 0.0000000876741
+R_REF = 10000  # Resistor de referência (10kΩ)
+VCC = 3.3  # Tensão de alimentação do circuito
+ADC_MAX = 1023  # Resolução de 10 bits (0-1023)
+
 def gerar_temp_corporal_suja_multipla():
     global falha_temp_paciente
     prob_outlier_temp = 0.05 # Aumentando a probabilidade de outliers de temperatura
@@ -71,7 +79,15 @@ def gerar_temp_corporal_suja_multipla():
                 outlier = round(random.uniform(46.0, 60.0), 1) # Temperaturas extremamente altas
             return [outlier, round(outlier + random.uniform(-0.5, 0.5), 1), round(outlier + random.uniform(-0.5, 0.5), 1)]
         else:
-            temp_celsius_original = round(random.uniform(36.0, 37.5), 1)
+
+            adc_value = random.randint(610, 670)  # Intervalo ajustado
+            V_sensor = (adc_value / ADC_MAX) * VCC
+            R_ntc = R_REF * ((VCC / V_sensor) - 1)
+
+            T_kelvin = 1 / (A + B * math.log(R_ntc) + C * (math.log(R_ntc))**3)
+            T_celsius = T_kelvin - 273.15
+
+            temp_celsius_original = round(T_celsius, 1) # Limitar a 1 casa decimal
             primeiro_resultado = gerar_valor_sujo(temp_celsius_original, taxa_ruido=0.01, prob_faltante=0.3, desvio_outlier=4, minimo=30.0, maximo=45.0, prob_iniciar_falha=0.003, duracao_max_falha=12)
             if isinstance(primeiro_resultado, int):
                 falha_temp_paciente = primeiro_resultado
@@ -96,7 +112,11 @@ def gerar_oximetro_sujo_multipla():
                 outlier = round(random.uniform(101.0, 110.0), 0)
             return [outlier, round(outlier + random.uniform(-1, 1), 0), round(outlier + random.uniform(-1, 1), 0)]
         else:
-            spo2_original = round(random.uniform(95.0, 99.0), 0)
+            V_sensor = random.uniform(1.6, 2.6)  # Aumentado para ampliar a faixa
+            SpO2 = 94 + (V_sensor - 2.0) * (10 / 1.0)  # Ajuste para cobrir 90-99%
+            SpO2 = max(90.0, min(SpO2, 99.0))  # Garante os limites
+            
+            spo2_original = round(SpO2, 1) # Limitar a 1 casa decimal
             primeiro_resultado = gerar_valor_sujo(spo2_original, taxa_ruido=0.005, prob_faltante=0.3, minimo=70.0, maximo=105.0, prob_iniciar_falha=0.004, duracao_max_falha=10)
             if isinstance(primeiro_resultado, int):
                 falha_oximetro = primeiro_resultado
@@ -130,8 +150,16 @@ def gerar_temp_ambiente_suja():
             else:
                 return round(random.uniform(-50.0, -26.0), 1) # Limitar a 1 casa decimal
 
+        A = 1.009249522e-03
+        B = 2.378405444e-04
+        C = 2.019202697e-07
+
+        R = random.uniform(8000, 12000)
+
+        T_kelvin = 1 / (A + B * math.log(R) + C * (math.log(R))**3)
+
         if minutos_decorridos == 0 or ultima_temp_ambiente is None:
-            temp_celsius_original = round(random.uniform(22.0, 24.0), 1) # Limitar a 1 casa decimal
+            temp_celsius_original = round(T_kelvin - 273.15, 1) # Limitar a 1 casa decimal
             ultima_temp_ambiente_temp = gerar_valor_sujo(temp_celsius_original, taxa_ruido=0.01, prob_faltante=0.05, minimo=15.0, maximo=35.0, prob_iniciar_falha=0.001, duracao_max_falha=10)
             if isinstance(ultima_temp_ambiente_temp, int):
                 falha_temp_ambiente = ultima_temp_ambiente_temp
@@ -168,8 +196,13 @@ def gerar_umidade_suja():
                 return round(random.uniform(-30.0, 39.0), 1) # Limitar a 1 casa decimal
             else:
                 return round(random.uniform(121.0, 150.0), 1) # Limitar a 1 casa decimal
+            
+        V_sensor = random.uniform(1, 3)
+        V_max = 3.3
+        RH = (V_sensor / V_max) * 100
+
         if minutos_decorridos == 0 or ultima_umidade is None:
-            umidade_original = round(random.uniform(40.0, 60.0), 1) # Limitar a 1 casa decimal
+            umidade_original = RH
             ultima_umidade_temp = gerar_valor_sujo(umidade_original, taxa_ruido=0.01, prob_faltante=0.05, minimo=30.0, maximo=70.0, prob_iniciar_falha=0.001, duracao_max_falha=10)
             if isinstance(ultima_umidade_temp, int):
                 falha_umidade = ultima_umidade_temp
@@ -195,7 +228,7 @@ def gerar_contagem_pessoas_suja():
         falha_visao -= 1
         return None
     else:
-        variacao = random.randint(-3, 3)
+        variacao = random.randint(-1, 1) 
         pessoas += variacao
         pessoas_suja = max(0, min(pessoas, 200))
         resultado = gerar_valor_sujo(pessoas_suja, taxa_ruido=0.015, prob_faltante=0.06, desvio_outlier=2, minimo=0, maximo=200, prob_iniciar_falha=0.001, duracao_max_falha=15)
