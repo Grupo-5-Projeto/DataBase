@@ -32,6 +32,39 @@ select * from temperatura_ambiente where fk_upa = 3;
 select * from temperatura_ambiente;
 select * from umidade;
 
+SELECT * 
+FROM umidade 
+WHERE data_hora LIKE '2025-04-28 11:%';
+
+
+SELECT 
+    hora,
+    AVG(valor) AS media_valor
+FROM (
+    SELECT 
+        DATE_FORMAT(data_hora, '%Y-%m-%d %H:00:00') AS hora,
+        valor
+    FROM 
+        umidade
+) AS subquery
+GROUP BY 
+    hora
+ORDER BY 
+    hora;
+
+UPDATE umidade
+SET valor = 90.2
+WHERE DATE(data_hora) = '2025-04-28'
+  AND TIME(data_hora) >= '11:00:00'
+  AND TIME(data_hora) < '11:30:00';
+  
+UPDATE umidade
+SET valor = 98.5
+WHERE DATE(data_hora) = '2025-04-28'
+  AND TIME(data_hora) >= '20:00:00'
+  AND TIME(data_hora) < '20:15:00';
+
+
 select * from temperatura_paciente;
 select * from oximetro;
 
