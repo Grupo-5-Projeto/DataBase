@@ -96,3 +96,10 @@ biometria BLOB,
 fk_paciente INT,
 FOREIGN KEY (fk_paciente) REFERENCES paciente(id_paciente)
 );
+
+CREATE TABLE atendimento (
+fk_biometria INT,
+FOREIGN KEY (fk_biometria) REFERENCES biometria(id_biometria),
+fk_upa INT,
+FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
+);
