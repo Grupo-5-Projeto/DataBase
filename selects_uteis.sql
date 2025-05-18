@@ -54,15 +54,15 @@ ORDER BY
 
 UPDATE umidade
 SET valor = 90.2
-WHERE DATE(data_hora) = '2025-04-28'
+WHERE DATE(data_hora) = '2025-04-29'
   AND TIME(data_hora) >= '11:00:00'
   AND TIME(data_hora) < '11:30:00';
   
 UPDATE umidade
 SET valor = 98.5
-WHERE DATE(data_hora) = '2025-04-28'
-  AND TIME(data_hora) >= '20:00:00'
-  AND TIME(data_hora) < '20:15:00';
+WHERE DATE(data_hora) = '2025-04-29'
+  AND TIME(data_hora) >= '19:00:00'
+  AND TIME(data_hora) < '19:15:00';
 
 
 select * from temperatura_paciente;
