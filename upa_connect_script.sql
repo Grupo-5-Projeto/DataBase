@@ -7,99 +7,42 @@ CREATE DATABASE upa_connect;
 
 USE upa_connect;
 
-CREATE TABLE endereco (
-id_endereco INT PRIMARY KEY AUTO_INCREMENT,
-cep CHAR(9),
-rua VARCHAR(70),
-bairro VARCHAR(45),
-numero INT,
-cidade VARCHAR(45),
-estado VARCHAR(45),
-latitude DOUBLE,
-longitude DOUBLE,
-entidade_referenciada CHAR(1)
+CREATE TABLE Upa (
+    id_upa INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(45),
+    capacidade_atendimento INT,
+    latitude DOUBLE,
+    longitude DOUBLE
 );
 
-CREATE TABLE upa (
-id_upa INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(90),
-cnpj CHAR(14),
-telefone CHAR(11),
-capacidade_atendimento INT,
-fk_endereco INT,
-FOREIGN KEY (fk_endereco) REFERENCES endereco(id_endereco)
+CREATE TABLE Paciente (
+    id_paciente INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(45),
+    cpf CHAR(11),
+    data_nascimento DATE,
+    biometria BLOB
 );
 
-CREATE TABLE tempo_espera (
-id_tempo_espera INT PRIMARY KEY AUTO_INCREMENT,
-tempo_espera INT,
-fk_upa INT,
-FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
+CREATE TABLE Sensor (
+    id_sensor INT PRIMARY KEY AUTO_INCREMENT,
+    nome_sensor VARCHAR(45)
 );
 
-CREATE TABLE temperatura_ambiente (
-id_temperatura_ambiente INT PRIMARY KEY AUTO_INCREMENT, 
-data_hora DATETIME,
-valor DECIMAL(3,1),
-fk_upa INT,
-FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
+CREATE TABLE UnidadeDeMedida (
+    id_unidade_de_medida INT PRIMARY KEY AUTO_INCREMENT,
+    unidade_de_medida VARCHAR(45)
 );
 
-CREATE TABLE umidade (
-id_umidade INT PRIMARY KEY AUTO_INCREMENT, 
-data_hora DATETIME,
-valor DECIMAL(4,1),
-fk_upa INT,
-FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
-);
-
-CREATE TABLE camera_computacional (
-id_camera INT PRIMARY KEY AUTO_INCREMENT, 
-data_hora DATETIME,
-qtd_pessoas INT,
-fk_upa INT,
-FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
-);
-
-CREATE TABLE paciente (
-id_paciente INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(45),
-cpf CHAR(11),
-data_nascimento DATE,
-carteira_sus CHAR(15),
-fk_endereco INT, 
-FOREIGN KEY (fk_endereco) REFERENCES endereco(id_endereco),
-fk_upa INT,
-FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
-);
-
-CREATE TABLE temperatura_paciente (
-id_temperatura_paciente INT PRIMARY KEY AUTO_INCREMENT, 
-data_hora DATETIME,
-valor DECIMAL(3,1),
-fk_paciente INT,
-FOREIGN KEY (fk_paciente) REFERENCES paciente(id_paciente)
-);
-
-CREATE TABLE oximetro (
-id_oximetro INT PRIMARY KEY AUTO_INCREMENT, 
-data_hora DATETIME,
-valor DECIMAL(4,1),
-fk_paciente INT,
-FOREIGN KEY (fk_paciente) REFERENCES paciente(id_paciente)
-);
-
-CREATE TABLE biometria (
-id_biometria INT PRIMARY KEY AUTO_INCREMENT, 
-data_hora DATETIME,
-biometria BLOB,
-fk_paciente INT,
-FOREIGN KEY (fk_paciente) REFERENCES paciente(id_paciente)
-);
-
-CREATE TABLE atendimento (
-fk_biometria INT,
-FOREIGN KEY (fk_biometria) REFERENCES biometria(id_biometria),
-fk_upa INT,
-FOREIGN KEY (fk_upa) REFERENCES upa(id_upa)
+CREATE TABLE HistoricoSensor (
+    id_registro INT PRIMARY KEY AUTO_INCREMENT,
+    data_hora DATETIME,
+    valor DECIMAL(5,2),
+    fk_upa INT,
+    FOREIGN KEY (fk_upa) REFERENCES Upa(id_upa),
+    fk_paciente INT,
+    FOREIGN KEY (fk_paciente) REFERENCES Paciente(id_paciente)
+    fk_sensor INT,
+    FOREIGN KEY (fk_sensor) REFERENCES Sensor(id_sensor),
+    fk_unid_medida INT,
+    FOREIGN KEY (fk_unid_medida) REFERENCES UnidadeDeMedida(id_unidade_de_medida)
 );
