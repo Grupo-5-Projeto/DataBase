@@ -42,6 +42,16 @@ INSERT INTO Paciente (nome, cpf, data_nascimento) VALUES
 ('Carlos Pereira', '30659423739', '2012-11-30'),
 ('Daniela Lima', '15362784900', '2016-03-14'),
 ('Eduardo Santos', '96283104517', '2014-07-21'),
+('Luiza Amaral', '23498104750', '2018-03-19'),
+('Miguel Tavares', '84571039216', '2020-07-25'),
+('Nina Cardoso', '49386217048', '2014-10-01'),
+('Otávio Luz', '91620348759', '2013-12-11'),
+('Pietra Moraes', '36284917056', '2019-01-30'),
+('Rebeca Soares', '49218573061', '2015-11-12'),
+('Samuel Andrade', '80312759406', '2018-04-09'),
+('Tainá Ribeiro', '62194837510', '2021-06-27'),
+('Ulisses Moraes', '70219648351', '2013-02-05'),
+('Vitória Alves', '15498236074', '2020-09-14'),
 
 -- 13–17 anos (2007 a 2011)
 ('Fernanda Almeida', '21794638081', '2010-12-09'),
@@ -49,6 +59,26 @@ INSERT INTO Paciente (nome, cpf, data_nascimento) VALUES
 ('Helena Castro', '64581093761', '2009-09-17'),
 ('Igor Mendes', '81034952708', '2007-04-08'),
 ('Juliana Costa', '43768291084', '2009-01-19'),
+('Raquel Mendes', '74019832561', '2007-09-04'),
+('Samuel Prado', '15498362070', '2008-03-15'),
+('Talita Gomes', '83620479102', '2011-05-20'),
+('Ubirajara Costa', '67230948190', '2010-08-03'),
+('Valéria Assis', '49018365271', '2009-02-14'),
+('Wesley Fernandes', '83461092735', '1993-09-11'),
+('Yasmin Cunha', '47109283614', '2002-06-05'),
+('Zeca Lemos', '18043729065', '1989-11-27'),
+('Aline Martins', '93520817456', '1990-01-10'),
+('Bruno Silveira', '20814793652', '2001-08-02'),
+('Carla Meireles', '69482103569', '1987-04-29'),
+('Daniel Rocha', '14509372864', '1998-05-17'),
+('Érica Vieira', '72038491620', '1994-03-06'),
+('Fábio Teixeira', '32648197045', '1996-12-22'),
+('Gustavo Lima', '23987410596', '1986-10-18'),
+('William Freitas', '83927418530', '2011-08-16'),
+('Ximena Duarte', '38402917561', '2009-07-22'),
+('Yuri Monteiro', '95203847164', '2007-12-01'),
+('Zara Nascimento', '67518420390', '2008-10-09'),
+('Adriano Cunha', '28490371659', '2010-03-29'),
 
 -- 18–39 anos (1985 a 2006)
 ('Karen Dias', '21905847350', '1999-02-28'),
@@ -60,6 +90,16 @@ INSERT INTO Paciente (nome, cpf, data_nascimento) VALUES
 ('Quésia Silva', '80136245798', '2001-11-11'),
 ('Rafael Nunes', '26984130756', '1995-08-14'),
 ('Sabrina Lopes', '49238675120', '1998-09-27'),
+('Bárbara Lopes', '70192834510', '2000-01-25'),
+('Caio Fernandes', '40291835761', '1992-12-13'),
+('Dandara Silva', '58932017642', '1995-10-07'),
+('Eduarda Matos', '14720938475', '1991-09-01'),
+('Fernando Rocha', '61472903854', '1985-11-17'),
+('Giovana Figueiredo', '30847291536', '1988-08-03'),
+('Hugo Martins', '94321058736', '1997-05-26'),
+('Isadora Ramos', '51837496021', '1993-04-19'),
+('Júlio César', '83194027516', '2003-07-31'),
+('Kelly Regina', '23019587412', '1999-02-22'),
 
 -- 40–59 anos (1965 a 1984)
 ('Thiago Batista', '65973281490', '1970-05-06'),
@@ -68,12 +108,32 @@ INSERT INTO Paciente (nome, cpf, data_nascimento) VALUES
 ('Wellington Prado', '35967284130', '1969-07-09'),
 ('Xuxa Menezes', '49068273154', '1975-01-29'),
 ('Yago Santos', '57193082647', '1982-06-13'),
+('Helena Borges', '81236450791', '1979-07-08'),
+('Ivan Souza', '30591820437', '1973-11-13'),
+('Joana Carvalho', '14720938564', '1981-02-26'),
+('Kleber Dias', '62017498305', '1976-06-04'),
+('Larissa Almeida', '28930471658', '1968-09-21'),
+('Leandro Borges', '41028597361', '1977-06-15'),
+('Marta Oliveira', '18563097452', '1983-10-28'),
+('Nilson Ribeiro', '30856279416', '1972-12-19'),
+('Odete Freire', '19472830567', '1967-03-04'),
+('Pedro Cunha', '64021839047', '1970-01-30'),
 
 -- 60+ anos (antes de 1965)
 ('Zuleica Moreira', '61289374052', '1955-10-10'),
 ('Arthur Monteiro', '98012647358', '1948-03-31'),
 ('Beatriz Campos', '27369041587', '1959-08-26'),
 ('Caio Barreto', '74168052901', '1952-12-21'),
+('Marcos Silva', '93847261035', '1950-02-09'),
+('Nair Fontes', '74319682041', '1945-08-17'),
+('Orlando Costa', '60412837591', '1962-01-29'),
+('Palmira Rocha', '31720864953', '1958-06-12'),
+('Querino Barbosa', '84502719643', '1949-04-05'),
+('Quitéria Santos', '31984720560', '1961-11-06'),
+('Raimundo Alves', '94810273650', '1953-05-18'),
+('Sebastião Costa', '76423918509', '1947-09-25'),
+('Tereza Matos', '48120396715', '1956-02-14'),
+('Ursulina Prado', '62498173059', '1949-12-03'),
 
 -- aleatorios
 ('Amanda Ribeiro', '83946275108', '1991-04-15'),
@@ -101,10 +161,8 @@ INSERT INTO Sensor (nome_sensor) VALUES
 ('Câmera de Visão Computacional'),
 ('DHT22'),
 ('MAX30102 - Oxímetro'),
-('MLX90614 - Termômetro')
-;
+('MLX90614 - Termômetro');
 
 INSERT INTO UnidadeDeMedida (unidade_de_medida) VALUES
 ('Celsius'),
-('Porcentagem')
-;
+('Porcentagem');

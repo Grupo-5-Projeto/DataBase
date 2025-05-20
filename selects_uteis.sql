@@ -137,3 +137,21 @@ GROUP BY
 ORDER BY 
   grupo
 ) AS subquery;
+
+select * from HistoricoSensor where fk_sensor = 3;
+select * from upa;
+
+SELECT fk_sensor, COUNT(DISTINCT fk_paciente) AS total_pacientes_distintos
+FROM HistoricoSensor
+WHERE fk_sensor IN (3, 4)
+GROUP BY fk_sensor;
+
+SELECT fk_paciente, data_hora, fk_sensor
+FROM HistoricoSensor
+WHERE fk_paciente IN (
+    SELECT fk_paciente
+    FROM HistoricoSensor
+    GROUP BY fk_paciente
+    HAVING COUNT(DISTINCT data_hora) > 1
+)
+ORDER BY fk_paciente, data_hora;

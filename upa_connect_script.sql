@@ -9,7 +9,7 @@ USE upa_connect;
 
 CREATE TABLE Upa (
     id_upa INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(45),
+    nome VARCHAR(60),
     capacidade_atendimento INT,
     latitude DOUBLE,
     longitude DOUBLE
@@ -40,7 +40,7 @@ CREATE TABLE HistoricoSensor (
     fk_upa INT,
     FOREIGN KEY (fk_upa) REFERENCES Upa(id_upa),
     fk_paciente INT,
-    FOREIGN KEY (fk_paciente) REFERENCES Paciente(id_paciente)
+    FOREIGN KEY (fk_paciente) REFERENCES Paciente(id_paciente),
     fk_sensor INT,
     FOREIGN KEY (fk_sensor) REFERENCES Sensor(id_sensor),
     fk_unid_medida INT,
