@@ -141,6 +141,12 @@ ORDER BY
 select * from HistoricoSensor where fk_sensor = 3;
 select * from upa;
 
+select * from HistoricoSensor;
+select * from sensor;
+select * from UnidadeDeMedida;
+select * from paciente;
+
+
 SELECT fk_sensor, COUNT(DISTINCT fk_paciente) AS total_pacientes_distintos
 FROM HistoricoSensor
 WHERE fk_sensor IN (3, 4)
