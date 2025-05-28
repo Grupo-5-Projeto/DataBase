@@ -214,5 +214,5 @@ INSERT INTO Sensor (nome_sensor) VALUES
 ('MLX90614 - Termômetro');
 
 INSERT INTO UnidadeDeMedida (unidade_de_medida) VALUES
-('Celsius'),
-('Porcentagem');
+('°C'),
+('%');
